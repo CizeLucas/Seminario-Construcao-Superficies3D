@@ -1,0 +1,29 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+# Define the triangle vertices (as an example)
+vertices = [
+    [(0, 0, 0), (1, 0, 0), (0, 1, 0)],  # First triangle
+    [(1, 0, 0), (1, 1, 0), (0, 1, 0)],  # Second triangle
+    [(0, 0, 0), (0, 1, 0), (0, 0, 1)],  # Third triangle
+]
+
+# Define colors for each triangle
+colors = ['red', 'green', 'blue']
+
+# Create the plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Loop through each triangle and add it to the plot
+for i, verts in enumerate(vertices):
+    tri = Poly3DCollection([verts], color=colors[i], alpha=0.7)
+    ax.add_collection3d(tri)
+
+# Set plot limits
+ax.set_xlim([0, 1])
+ax.set_ylim([0, 1])
+ax.set_zlim([0, 1])
+
+plt.show()
