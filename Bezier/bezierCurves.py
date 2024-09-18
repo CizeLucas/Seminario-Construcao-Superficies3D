@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import math
-from utilities import *
 
 # Pontos de Controle:
 x = np.array([[-0.5, -2, 0], [1, 1, 1], [2, 2, 2]])
@@ -37,38 +36,73 @@ zBezier = np.zeros((uCells, wCells))
 
 # Funções para calcular os coeficientes binomiais:
 def Ni(n, i):
-        return (np.math.factorial(n) / (np.math.factorial(i) * np.math.factorial(n - i)))
+        return (math.factorial(n) / (math.factorial(i) * math.factorial(n - i)))
 
 def Mj(m, j):
-    return (np.math.factorial(m) / (np.math.factorial(j) * np.math.factorial(m - j)))
+    return (math.factorial(m) / (math.factorial(j) * math.factorial(m - j)))
 
 # Funções para calcular as Bases do Polinômio de Bernstein
+def J(n, i, u):
+    return np.matrix(Ni(n, i) * (u ** i) * (1 - u) ** (n - i))
+
+def K(m, j, w):
+    return np.matrix(Mj(m, j) * (w ** j) * (1 - w) ** (m - j))
+
+# LOOPS PRINCIPAIS:
+for i in range(0, uPTS):
+    for j in range(0, wPTS):
+        
+        Jt = J(n, i, u)
+        Kt = K(m, j, w)
+
+        # Armazena os resultados das funções Basis
+        b.append(Jt)
+        d.append(Kt)
+
+        # Calcula a transposta do array Jt
+        Jt = Jt.transpose()
+
+        # Calculando o ponto da curva Bezier da iteração
+        xBezier = Jt * Kt * x[i, j] + xBezier
+        yBezier = Jt * Kt * y[i, j] + yBezier
+        zBezier = Jt * Kt * z[i, j] + zBezier
 
 
-print(x)
-print(y)
-print(z)
+# Plotagem:
 
-print(u)
-print(w)
-
-
-def calculate_value(x, y):
-    value = x**2 + y**2 - 5
-    if(value < 0):
-        value = value * -1
-    result = - math.sqrt(value)
-    return result
-
-X = np.arange(0, 5, 0.1)
-Y = np.arange(0, 5, 0.1)
-Z = np.zeros((X.size, Y.size))
-
-for i in range(X.size):
-    Z[i] = calculate_value(X[i], Y[i])
-
-# Plotando pontos unitários em 3D
 fig = plt.figure(figsize=(18,24))
 ax = plt.axes(projection="3d")
-ax.scatter(X, Y, Z)
+ax.view_init(elev=30, azim=42)  # Elevation = 30 degrees, Azimuth = 60 degrees
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+
+colors = ["red", "green", "blue"]
+for i in range(3):
+    ax.scatter(x[i], y[i], z[i], color=colors[i])
+
+plt.show()
+
+
+if(False):
+    # Valores dos polinômios de Berstein
+    plt.figure()
+    plt.subplot(121)
+    for line in b:
+        plt.plot(u, line.transpose())
+    plt.show()
+
+    plt.figure()
+    plt.subplot(121)
+    for line in d:
+        plt.plot(w, line.transpose())
+    plt.show()
+
+print(xBezier)
+print(yBezier)
+print(zBezier)
+
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+ax.plot_surface(xBezier, yBezier, zBezier)
+ax.scatter(x, y, z, edgecolors="face")
 plt.show()

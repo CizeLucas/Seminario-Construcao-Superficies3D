@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial import Delaunay
-from scipy.spatial import ConvexHull
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 # Definições do Usuario:
@@ -46,10 +45,23 @@ print(Z.shape)
 x = X.flatten()
 y = Y.flatten()
 z = Z.flatten()
+Z_zeros = np.zeros(z.shape) # gera um array de zeros do mesmo formato de z
 
 print(x.shape)
 print(y.shape)
 print(z.shape)
+
+# -------------------------------------------------------------------------------------------------
+# GERA O GRAFICO DA SUPERFÍCIE DESTACANDO OS PONTOS DE CONTROLE
+
+fig = plt.figure(figsize=(18,24))
+ax = plt.axes(projection="3d")
+ax.view_init(elev=30, azim=42)  # Elevation = 30 degrees, Azimuth = 60 degrees
+
+ax.scatter(x, y, Z_zeros)
+plt.show()
+# -------------------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------------------
 # GERA O GRAFICO DA SUPERFÍCIE DESTACANDO OS PONTOS DE CONTROLE

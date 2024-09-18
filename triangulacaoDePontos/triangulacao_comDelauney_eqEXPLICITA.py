@@ -3,21 +3,35 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial import Delaunay
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+import math
 
 # Definições do Usuario:
 
     # Dominio da função:
 xMinValue = 0
-xMaxValue = 3.1415
+xMaxValue = 2*np.pi
 yMinValue = 0
-yMaxValue = 3.1415
+yMaxValue = 2*np.pi
 
-QtdDePontosDeControle = 20  # OBS: quantidade de 
+QtdDePontosDeControle = 20  # OBS: quantidade de em cada eixo
 
+seletorDeFuncao = 4 # Seleção da função a ser plotada (confira também o intervalo de domínio acima)
 
     # Definição da Função:
-def funcao(x, y):
-        return np.sin(x) * np.cos(y)
+
+def funcao(x, y, select):
+    match select:
+        case 1:
+            return (np.exp(x)*(np.sin(x) + np.cos(y)))
+        case 2:
+            return np.sqrt(x**2 + y**2) + 3*np.cos(np.sqrt(x**2 + y**2)) + 5
+        case 3:
+            return x**2 + y**2
+        case 4:
+            return np.sin(x*y)
+        case _:
+            return np.sin(x) * np.cos(y)
+
 
 # Generate evenly spaced values for x and y using np.linspace
 X = np.linspace(xMinValue, xMaxValue, QtdDePontosDeControle)
@@ -26,12 +40,25 @@ Y = np.linspace(yMinValue, yMaxValue, QtdDePontosDeControle)
 X, Y = np.meshgrid(X, Y)
 
 # Calculate Z values as a function of X and Y
-Z = funcao(X, Y)
+Z = funcao(X, Y, seletorDeFuncao)
+
 
 # Flatten the arrays for triangulation (Delaunay works on 2D arrays)
 x = X.flatten()
 y = Y.flatten()
 z = Z.flatten()
+Z_zeros = np.zeros(z.shape) # gera um array de zeros do mesmo formato de z
+
+# -------------------------------------------------------------------------------------------------
+# GERA O GRAFICO DESTACANDO APENAS OS PONTOS DE IMAGEM UTILIZADOS
+
+fig = plt.figure(figsize=(18,24))
+ax = plt.axes(projection="3d")
+ax.view_init(elev=30, azim=42)  # Elevation = 30 degrees, Azimuth = 60 degrees
+
+ax.scatter(x, y, Z_zeros)
+plt.show()
+# -------------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------------------
 # GERA O GRAFICO DA SUPERFÍCIE DESTACANDO OS PONTOS DE CONTROLE
