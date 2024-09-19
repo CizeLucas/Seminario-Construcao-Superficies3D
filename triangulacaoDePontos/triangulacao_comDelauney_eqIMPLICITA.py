@@ -6,24 +6,26 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 # Definições do Usuario:
 
-    # Raio da Esfera:
-r = 5
-
-    # Dominio da função:
+    # Intervalo paramétrico:
 thetaMinValue = 0
 thetaMaxValue = 2*np.pi
 phiMinValue = 0
 phiMaxValue = np.pi
 
+    # Raio da Esfera:
+r = 5
+
 QtdDePontosDeControle = 15  # OBS: quantidade de pontos de controle
 
-# Generate evenly spaced values for x and y using np.linspace
+# Gera valores igualmente espaçados para a variação paramétrica de theta e phi
 theta = np.linspace(thetaMinValue, thetaMaxValue, QtdDePontosDeControle)
 phi = np.linspace(phiMinValue, phiMaxValue, QtdDePontosDeControle)
 
+
+# Gera as matrize X e Y para descrever o conjunto de pontos de parametrização theta e phi
 theta, phi = np.meshgrid(theta, phi)
 
-    # Definição das Funções:
+    # Definição das Funções Parametrizadas da ESFERA:
 def funcaoX(theta, phi):
         return r * np.sin(phi) * np.cos(theta)
 
@@ -33,6 +35,7 @@ def funcaoY(theta, phi):
 def funcaoZ(theta, phi):
         return r * np.cos(phi)
 
+# Calcula os pontos no R³ (x, y, z) passando as variaveis de parametrização pelas funções parametrizadas 
 X = funcaoX(theta, phi)
 Y = funcaoY(theta, phi)
 Z = funcaoZ(theta, phi)
@@ -41,7 +44,7 @@ print(X.shape)
 print(Y.shape)
 print(Z.shape)
 
-# Flatten the arrays for triangulation (Delaunay works on 2D arrays)
+# Transforma as matrizes X, Y e Z em vetores unidimensionais 
 x = X.flatten()
 y = Y.flatten()
 z = Z.flatten()
@@ -56,7 +59,7 @@ print(z.shape)
 
 fig = plt.figure(figsize=(18,24))
 ax = plt.axes(projection="3d")
-ax.view_init(elev=30, azim=42)  # Elevation = 30 degrees, Azimuth = 60 degrees
+ax.view_init(elev=30, azim=42)
 
 ax.scatter(x, y, Z_zeros)
 plt.show()
@@ -68,18 +71,18 @@ plt.show()
 
 fig = plt.figure(figsize=(18,24))
 ax = plt.axes(projection="3d")
-ax.view_init(elev=30, azim=42)  # Elevation = 30 degrees, Azimuth = 60 degrees
+ax.view_init(elev=30, azim=42)
 
 ax.scatter(x, y, z)
 plt.show()
 # -------------------------------------------------------------------------------------------------
 
-
-points = np.vstack((theta.flatten(), phi.flatten())).T  # 2D array of (x, y) points for triangulation
+# Gera um array com os pares de pontos (x, y) para serem triangulados
+points = np.vstack((theta.flatten(), phi.flatten())).T
 
 print(points)
 
-# Perform Delaunay triangulation
+# Calcula a triangulação com o Algoritimo de Delaunay (biblioteca Scipy)
 tri = Delaunay(points)
 
 print(tri.simplices)
@@ -87,6 +90,7 @@ print(tri.simplices)
 # -------------------------------------------------------------------------------------------------
 # GERA O GRAFICO DA FUNÇÃO DESTACANDO A REDE DE TRIANGULOS QUE DEFINE A SUPERFÍCIE
 
+# Obtem os índices dos pares de aresta dos triangulos (exemplo: triangulo [79, 95, 110] -> [79, 95], [95, 110], [79, 110])
 def triangulosParaLados(triangulos):
     lados = set([])
     for tri in triangulos:
@@ -110,6 +114,7 @@ for lado in lados:
     yj = y[lado[1]]
     zj = z[lado[1]]
 
+    # Plota as linhas arestas dos triangulos
     ax.plot([xi, xj], [yi, yj], [zi, zj])
 plt.show()
 # -------------------------------------------------------------------------------------------------
@@ -132,7 +137,7 @@ fig = plt.figure(figsize=(18,24))
 ax = fig.add_subplot(111, projection='3d')
 ax.view_init(elev=30, azim=42)
 
-# Loop through each triangle and add it to the plot
+# Itera sobre cada triangulo e aplica uma cor a sua face
 for i, verts in enumerate(verticesTriangulos):
     tri = Poly3DCollection([verts], color=colors[(i%3)], alpha=0.5)
     ax.add_collection3d(tri)

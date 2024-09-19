@@ -15,33 +15,44 @@ yMaxValue = 2*np.pi
 
 QtdDePontosDeControle = 20  # OBS: quantidade de em cada eixo
 
-seletorDeFuncao = 4 # Seleção da função a ser plotada (confira também o intervalo de domínio acima)
+seletorDeFuncao = 1 # Seleção da função a ser plotada (confira também o intervalo de domínio acima)
 
     # Definição da Função:
 
 def funcao(x, y, select):
     match select:
         case 1:
-            return (np.exp(x)*(np.sin(x) + np.cos(y)))
+            return (np.exp(x)*(np.sin(x) + np.cos(y))) # exp(Z) com Z sendo um número complexo
         case 2:
-            return np.sqrt(x**2 + y**2) + 3*np.cos(np.sqrt(x**2 + y**2)) + 5
+            return np.sqrt(x**2 + y**2) + 3*np.cos(np.sqrt(x**2 + y**2)) + 5 # Superfície Ondulada
         case 3:
-            return x**2 + y**2
+            return x**2 + y**2 # Paraboloide Circular
         case 4:
             return np.sin(x*y)
         case _:
-            return np.sin(x) * np.cos(y)
+            return np.sin(x) * np.cos(y) # Superfície de ondulação de sen() e cos()
 
 
-# Generate evenly spaced values for x and y using np.linspace
+# Gera valores igualmente espaçados para a variação paramétrica de x e y
 X = np.linspace(xMinValue, xMaxValue, QtdDePontosDeControle)
 Y = np.linspace(yMinValue, yMaxValue, QtdDePontosDeControle)
 
+if(True):
+    print(X)
+    print(Y)
+
+# Gera as matrize X e Y para descrever o conjunto de pontos (x, y)
 X, Y = np.meshgrid(X, Y)
 
-# Calculate Z values as a function of X and Y
+if(True):
+    print(X)
+    print(Y)
+
+# Calcula os valores de Z com X e Y
 Z = funcao(X, Y, seletorDeFuncao)
 
+if(True):
+    print(Z)
 
 # Flatten the arrays for triangulation (Delaunay works on 2D arrays)
 x = X.flatten()
@@ -54,7 +65,7 @@ Z_zeros = np.zeros(z.shape) # gera um array de zeros do mesmo formato de z
 
 fig = plt.figure(figsize=(18,24))
 ax = plt.axes(projection="3d")
-ax.view_init(elev=30, azim=42)  # Elevation = 30 degrees, Azimuth = 60 degrees
+ax.view_init(elev=30, azim=42)
 
 ax.scatter(x, y, Z_zeros)
 plt.show()
@@ -65,21 +76,22 @@ plt.show()
 
 fig = plt.figure(figsize=(18,24))
 ax = plt.axes(projection="3d")
-ax.view_init(elev=30, azim=42)  # Elevation = 30 degrees, Azimuth = 60 degrees
+ax.view_init(elev=30, azim=42)
 
 ax.scatter(x, y, z)
 plt.show()
 # -------------------------------------------------------------------------------------------------
 
+# Gera um array com os pares de pontos (x, y) para serem triangulados
+points = np.vstack((x, y)).T
 
-points = np.vstack((x, y)).T  # 2D array of (x, y) points for triangulation
-
-# Perform Delaunay triangulation
+# Calcula a triangulação com o Algoritimo de Delaunay (biblioteca Scipy)
 tri = Delaunay(points)
 
 # -------------------------------------------------------------------------------------------------
 # GERA O GRAFICO DA FUNÇÃO DESTACANDO A REDE DE TRIANGULOS QUE DEFINE A SUPERFÍCIE
 
+# Obtem os índices dos pares de aresta dos triangulos (exemplo: triangulo [79, 95, 110] -> [79, 95], [95, 110], [79, 110])
 def triangulosParaLados(triangulos):
     lados = set([])
     for tri in triangulos:
@@ -103,6 +115,7 @@ for lado in lados:
     yj = y[lado[1]]
     zj = z[lado[1]]
 
+    # Plota as linhas arestas dos triangulos
     ax.plot([xi, xj], [yi, yj], [zi, zj])
 plt.show()
 # -------------------------------------------------------------------------------------------------
@@ -125,7 +138,7 @@ fig = plt.figure(figsize=(18,24))
 ax = fig.add_subplot(111, projection='3d')
 ax.view_init(elev=30, azim=42)
 
-# Loop through each triangle and add it to the plot
+# Itera sobre cada triangulo e aplica uma cor a sua face
 for i, verts in enumerate(verticesTriangulos):
     tri = Poly3DCollection([verts], color=colors[(i%3)], alpha=0.5)
     ax.add_collection3d(tri)
